@@ -24,6 +24,7 @@ import io.airlift.airline.Command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -46,10 +47,23 @@ public class TableHistograms extends NodeToolCmd
     public void execute(NodeProbe probe)
     {
         Map<String, List<String>> tablesList = new HashMap<>();
-        if (args.size() == 2)
+        if (args.size() == 1 || args.size() == 2)
         {
-            String keyspace = args.get(0);
-            String table = args.get(1);
+            String keyspace;
+            String table;
+
+            if (args.size() == 1)
+            {
+                String[] input = args.get(0).split("\\.");
+                checkArgument(input.length == 2, "tablehistograms requires keyspace and table name arguments");
+                keyspace = input[0];
+                table = input[1];
+            }
+            else // args.size() == 2
+            {
+                keyspace = args.get(0);
+                table = args.get(1);
+            }
 
             List<String> keyspaces = probe.getKeyspaces();
             if (!keyspaces.contains(keyspace))
@@ -76,13 +90,7 @@ public class TableHistograms extends NodeToolCmd
                 throw new IllegalArgumentException("Unknown table: " + table + " in keyspace: " + keyspace);
             }
 
-            tablesList.put(keyspace, new ArrayList<String>(Arrays.asList(table)));
-        }
-        else if (args.size() == 1)
-        {
-            String[] input = args.get(0).split("\\.");
-            checkArgument(input.length == 2, "tablehistograms requires keyspace and table name arguments");
-            tablesList.put(input[0], new ArrayList<String>(Arrays.asList(input[1])));
+            tablesList.put(keyspace, new ArrayList<String>(Collections.singletonList(table)));
         }
         else
         {
