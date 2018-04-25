@@ -23,8 +23,11 @@ import io.airlift.command.Arguments;
 import io.airlift.command.Command;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.cassandra.db.ColumnFamilyStoreMBean;
 import org.apache.cassandra.metrics.CassandraMetricsRegistry;
 import org.apache.cassandra.tools.NodeProbe;
 import org.apache.cassandra.tools.NodeTool.NodeToolCmd;
@@ -45,6 +48,27 @@ public class TableHistograms extends NodeToolCmd
         {
             keyspace = args.get(0);
             table = args.get(1);
+
+            List<String> keyspaces = probe.getKeyspaces();
+            if (!keyspaces.contains(keyspace)) {
+                throw new IllegalArgumentException("Unknown keyspace: " + keyspace);
+            }
+
+            Iterator<Map.Entry<String, ColumnFamilyStoreMBean>> cfStoreMBeanProxies = probe.getColumnFamilyStoreMBeanProxies();
+
+            boolean tableFound = false;
+            while (cfStoreMBeanProxies.hasNext()) {
+                Map.Entry<String, ColumnFamilyStoreMBean> proxy = cfStoreMBeanProxies.next();
+
+                if (proxy.getKey().equals(keyspace) && proxy.getValue().getTableName().equals(table)) {
+                    tableFound = true;
+                    break;
+                }
+            }
+
+            if (!tableFound) {
+                throw new IllegalArgumentException("Unknown table: " + table + " in keyspace: " + keyspace);
+            }
         }
         else if (args.size() == 1)
         {
