@@ -50,23 +50,27 @@ public class TableHistograms extends NodeToolCmd
             table = args.get(1);
 
             List<String> keyspaces = probe.getKeyspaces();
-            if (!keyspaces.contains(keyspace)) {
+            if (!keyspaces.contains(keyspace))
+            {
                 throw new IllegalArgumentException("Unknown keyspace: " + keyspace);
             }
 
             Iterator<Map.Entry<String, ColumnFamilyStoreMBean>> cfStoreMBeanProxies = probe.getColumnFamilyStoreMBeanProxies();
 
             boolean tableFound = false;
-            while (cfStoreMBeanProxies.hasNext()) {
+            while (cfStoreMBeanProxies.hasNext())
+            {
                 Map.Entry<String, ColumnFamilyStoreMBean> proxy = cfStoreMBeanProxies.next();
 
-                if (proxy.getKey().equals(keyspace) && proxy.getValue().getTableName().equals(table)) {
+                if (proxy.getKey().equals(keyspace) && proxy.getValue().getTableName().equals(table))
+                {
                     tableFound = true;
                     break;
                 }
             }
 
-            if (!tableFound) {
+            if (!tableFound)
+            {
                 throw new IllegalArgumentException("Unknown table: " + table + " in keyspace: " + keyspace);
             }
         }
