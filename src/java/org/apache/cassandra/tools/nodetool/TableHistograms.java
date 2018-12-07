@@ -87,7 +87,7 @@ public class TableHistograms extends NodeToolCmd
 
             if (!tableFound)
             {
-                throw new IllegalArgumentException("Unknown table: " + table + " in keyspace: " + keyspace);
+                throw new IllegalArgumentException("Unknown table " + keyspace + "." + table);
             }
 
             tablesList.put(keyspace, new ArrayList<String>(Collections.singletonList(table)));
